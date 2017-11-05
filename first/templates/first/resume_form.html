@@ -1,0 +1,323 @@
+{% extends 'first/base.html' %}
+{% load static %}
+{% block content %}
+<!--<form method="POST" action="/user/add_resume">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type='submit' value="Submit"/>
+</form>-->
+<p><h5><pre> Basic Information</pre></h5></p>
+<form id="myForm" method="POST" action="/user/make_resume/" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if resume %}
+    <input type='text' value={{ resume.id }} name='hid' hidden></input>
+    {% endif %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.non_form_errors }}
+      {{ form.id }}
+    <div class="row">
+        <div class="input-field col s6">
+            <i class="material-icons prefix">account_circle</i>
+            {{form.name}}
+            {{form.name.label_tag}}
+        </div>
+        <div class="input-field col s5">
+            <i class="material-icons prefix">list</i>
+            {{form.year}}
+            {{form.year.label_tag}}
+        </div>
+        <div class="input-field col s1">
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s6">
+            <i class="material-icons prefix">assignment_ind</i>
+            {{form.dept}}
+            {{form.dept.label_tag}}
+        </div>
+        <div class="input-field col s5">
+            <i class="material-icons prefix">email</i>
+            {{form.email.label_tag}}
+            {{form.email}}
+        </div>
+        <div class="input-field col s1">
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s6">
+            <i class="material-icons prefix">phone</i>
+            {{form.phone.label_tag}}
+            {{form.phone}}
+        </div>
+        <div class="input-field col s6">
+            <i class="material-icons prefix">assessment</i>
+            {{form.CPI.label_tag}}
+            {{form.CPI}}
+        </div>
+    </div>
+
+    <h5><pre> Academic qualifications</pre></h5>
+    {{ examformset.management_form }}
+      <div class="row">
+        <div class="input-field col s1">
+            {{form.verified.label_tag}}
+        </div>
+        <div class="input-field col s2">
+            <b>Degree/Certificate</b>
+        </div>
+        <div class="input-field col s2">
+            <b>Year</b>
+        </div>
+        <div class="input-field col s2">
+            <b>Institute</b>
+        </div>
+        <div class="input-field col s2">
+            <b>CGPA/Percentage</b>
+        </div>
+        <div class="input-field col s2">
+            <b>Proof</b>
+        </div>
+      </div>
+      <hr color="blue;">
+    {% for form in examformset.forms %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.non_form_errors }}
+      {{ form.id }}
+        <div class="exam-formset">
+          <div class="row">
+            <div class="input-field col s1" style="padding-left: 3%;">
+                {% if form.instance.pk %}
+                    {% if form.instance.verified == 2 %}
+                        <img src="{% static 'tick.png' %}" style="width:34px;height:34px;" title="Verified"/>
+                    {% elif form.instance.verified == 1 %}
+                        <a style="color:black" title="Not verified yet"><i class="material-icons prefix">stars</i></a>
+                    {% else %}
+                        <img src="{% static 'cross.png' %}" style="width:30px;height:30px;" title="{{ form.instance.spocomment}}"/>
+                    {% endif %}
+                {% else %}
+                    <i class="material-icons prefix">stars</i>
+                {% endif %}
+            </div>
+            <div class="input-field col s2">
+                {{form.name}}
+            </div>
+            <div class="input-field col s2">
+                {{form.year}}
+            </div>
+            <div class="input-field col s2">
+                {{form.institute}}
+            </div>
+            <div class="input-field col s2">
+                {{form.cgpa_percentage}}
+            </div>
+            <div class="input-field col s2">
+                <div class="file-field input-field">
+                  <div class="btn">
+                    <span>Upload</span>
+                    {{form.proof}}
+                  </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                      </div>
+                </div>
+            </div>
+          </div>
+<!--         {{ form.as_p }} -->
+        </div>
+        {% if form.instance.pk %}
+            <p>{{ form.DELETE }}</p>
+        {% endif %}
+    {% endfor %}
+
+    <h5><pre> Projects/Internships</pre></h5>
+      <div class="row">
+        <div class="input-field col s1" style="padding-left: 3%;">
+            {{form.verified.label_tag}}
+        </div>
+        <div class="input-field col s3">
+            <b>Title</b>
+        </div>
+        <div class="input-field col s6">
+            <b>Description</b>
+        </div>
+        <div class="input-field col s2">
+            <b>Proof</b>
+        </div>
+      </div>
+      <hr color="blue;">
+    {% for form in projectformset.forms %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.non_form_errors }}
+      {{ form.id }}
+        <div class="project-formset">
+          <div class="row">
+            <div class="input-field col s1" style="padding-left: 3%;">
+                {% if form.instance.pk %}
+                    {% if form.instance.verified == 2 %}
+                        <img src="{% static 'tick.png' %}" style="width:34px;height:34px;" title="Verified"/>
+                    {% elif form.instance.verified == 1 %}
+                        <a style="color:black" title="Not verified yet"><i class="material-icons prefix">stars</i></a>
+                    {% else %}
+                        <img src="{% static 'cross.png' %}" style="width:30px;height:30px;" title="{{ form.instance.spocomment}}"/>
+                    {% endif %}
+                {% else %}
+                    <i class="material-icons prefix">stars</i>
+                {% endif %}
+            </div>
+            <div class="input-field col s3">
+                {{form.title}}
+            </div>
+            <div class="input-field col s6">
+                <i class="material-icons prefix">mode_edit</i>
+                {{form.description}}
+            </div>
+            <div class="input-field col s2">
+                <div class="file-field input-field">
+                  <div class="btn">
+                    <span>Upload</span>
+                    {{form.proof}}
+                  </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                      </div>
+                </div>
+            </div>
+          </div>
+
+        </div>
+        {% if form.instance.pk %}
+            <p>{{ form.DELETE }}</p>
+        {% endif %}
+    {% endfor %}
+    {{ projectformset.management_form }}
+
+    <h5><pre> Technical Skills</pre></h5>
+      <div class="row">
+        <div class="input-field col s1">
+        </div>
+        <div class="input-field col s3">
+            <b>Title</b>
+        </div>
+        <div class="input-field col s8">
+            <b>Description</b>
+        </div>
+      </div>
+      <hr color="blue;">
+    {% for form in technicalskillformset.forms %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.non_form_errors }}
+      {{ form.id }}
+        <div class="technical-skill-formset">
+          <div class="row">
+            <div class="input-field col s1" style="padding-left: 3%;">
+                <i class="material-icons prefix">stars</i>
+            </div>
+            <div class="input-field col s3">
+                {{form.title}}
+            </div>
+            <div class="input-field col s8">
+                <i class="material-icons prefix">mode_edit</i>
+                {{form.description}}
+            </div>
+          </div>    
+        </div>
+        {% if form.instance.pk %}
+            <p>{{ form.DELETE }}</p>
+        {% endif %}
+    {% endfor %}
+    {{ technicalskillformset.management_form }}
+
+    <h5><pre>Scholastic Achievements</pre></h5>
+      <div class="row">
+        <div class="input-field col s1" style="padding-left: 3%;">
+            {{form.verified.label_tag}}
+        </div>
+        <div class="input-field col s9">
+            <b>Achievement</b>
+        </div>
+        <div class="input-field col s2">
+            <b>Proof</b>
+        </div>
+      </div>
+      <hr color="blue;">
+    {% for form in scholasticachievementsformset.forms %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.non_form_errors }}
+      {{ form.id }}
+        <div class="scholastic-formset">
+          <div class="row">
+            <div class="input-field col s1" style="padding-left: 3%;">
+                {% if form.instance.pk %}
+                    {% if form.instance.verified == 2 %}
+                        <img src="{% static 'tick.png' %}" style="width:34px;height:34px;" title="Verified"/>
+                    {% elif form.instance.verified == 1 %}
+                        <a style="color:black" title="Not verified yet"><i class="material-icons prefix">stars</i></a>
+                    {% else %}
+                        <img src="{% static 'cross.png' %}" style="width:30px;height:30px;" title="{{ form.instance.spocomment}}"/>
+                    {% endif %}
+                {% else %}
+                    <i class="material-icons prefix">stars</i>
+                {% endif %}
+            </div>
+            <div class="input-field col s9">
+                <i class="material-icons prefix">mode_edit</i>
+                {{form.string}}
+            </div>
+            <div class="input-field col s2">
+                    <div class="file-field input-field">
+                      <div class="btn">
+                        <span>Upload</span>
+                        {{form.proof}}
+                      </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                          </div>
+                    </div>
+            </div>
+          </div>
+
+        </div>
+        {% if form.instance.pk %}
+            <p>{{ form.DELETE }}</p>
+        {% endif %}
+    {% endfor %}
+    {{ scholasticachievementsformset.management_form }}
+
+<p><button class="btn waves-effect waves-light" type="submit" name="action"><input type="submit" value="Submit"></input>
+</button></p>
+    <br>
+</form>
+<script src="{% static 'jquery.formset.js' %}"></script>
+<script>
+    $('.exam-formset').formset({
+        addText: 'Add another academic info',
+        deleteText: 'Remove'
+    });
+</script>
+<script>
+    $('.project-formset').formset({
+        addText: 'Add another project',
+        deleteText: 'Remove'
+    });
+</script>
+<script>
+    $('.technical-skill-formset').formset({
+        addText: 'Add another technical skill',
+        deleteText: 'Remove'
+    });
+</script>
+<script>
+    $('.scholastic-formset').formset({
+        addText: 'Add another scholastic achievement',
+        deleteText: 'Remove'
+    });
+</script>
+
+{% endblock %}

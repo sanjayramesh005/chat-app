@@ -1,0 +1,30 @@
+{% extends 'first/base.html' %}
+
+    {% block navbar %}
+    <div>
+        {% if user.is_authenticated %}
+        <p>Hello, {{ request.user.username }}<p>
+        <p><a href="/user/logout">Logout</a></p>
+        {% endif %}
+    </div>
+    {% endblock %}
+    {% block content %}
+    {% if not user.is_authenticated %}
+    {{ empty_fields }}{{ wrong_input }}
+    {% if wrong_input %}
+        <p>* Wrong Credentials</p>
+    {% endif %}
+    {% if empty_fields %}
+        <p>* Fill all the fields</p>
+    {% endif %}
+    {% csrf_token %}
+    <form method="POST" action="/user/login/">
+        {% csrf_token %}
+    <p><label for="username" value="Username">Username</label>
+    <input type="text" id='username' name="username" required/></p>
+    <p><label for="password" value="Password">Password</label>
+        <input id="password" name="password" type="password" required/></p>
+        <input type='submit' value="Login">
+    </form>
+    {% endif %}
+    {% endblock %}

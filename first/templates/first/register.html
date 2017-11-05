@@ -1,0 +1,12 @@
+{% extends 'first/base.html' %}
+
+{% block content %}
+<form method="POST" action="/user/register/">
+    {% csrf_token %}
+    {% if email_exists %}
+        <p>* Account the given email already exists</p>
+    {% endif %}
+    {{ form.as_p }}
+    <input type='submit' value="Register"/>
+</form>
+{% endblock %}

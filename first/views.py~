@@ -1,0 +1,771 @@
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse, get_object_or_404
+from django.core.urlresolvers import reverse
+from forms import UserForm, ResumeForm
+from . import forms
+from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate, logout
+from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_protect
+from django.template import RequestContext
+from django.forms import modelformset_factory, inlineformset_factory
+from . import models
+from django.contrib.auth.decorators import login_required
+from django.template.loader import get_template
+from subprocess import Popen, PIPE
+from django.template import Context
+import tempfile
+import os
+
+# Create your views here.
+
+def information_view(request):
+    return render(request,'first/information.html',{})
+
+@login_required(login_url='/user/login/')
+def view_template_view(request, template_id):
+    if int(template_id)<1 or int(template_id)>3:
+        return HttpResponse("<h1>Template not correctly selected</h1>")
+    r = HttpResponse(content_type='application/pdf')
+<<<<<<< HEAD
+    if template_id==1:
+        f =open(os.path.join('resumetemplates', 'template1.pdf'), 'rb')
+    elif template_id==2:
+        f =open(os.path.join('resumetemplates', 'template2.pdf'), 'rb')
+    else:
+=======
+    if template_id=='1':
+        f =open(os.path.join('resumetemplates', 'template1.pdf'), 'rb')
+    elif template_id=='2':
+        f =open(os.path.join('resumetemplates', 'template2.pdf'), 'rb')
+    elif template_id=='3':
+>>>>>>> e8d175bb3c51565ce3a6b4ab0028de255479c50c
+        f =open(os.path.join('resumetemplates', 'template3.pdf'), 'rb')
+    pdf = f.read()
+    r.write(pdf)
+    return r
+
+
+def register_view(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/user/')
+    if request.method=='POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            email_exists = User.objects.filter(email=form.cleaned_data['email']).exists()
+            if email_exists:
+                return render(request, 'first/register.html', {'form':form, 'email_exists':True, 'fail':True})
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            user = User.objects.create_user(username, email, password)
+            user.last_name = last_name
+            user.first_name = first_name
+            user.save()
+            user=authenticate(username=username, password=password)
+            login(request, user)
+            url = reverse('home_url')
+            return HttpResponseRedirect(url)
+        else:
+            return render(request, 'first/register.html', {'form':form, 'fail':True})
+    else:
+        form = UserForm()
+        return render(request, 'first/register.html', {'form':form, 'fail':False})
+
+def home_view(request):
+    #c = RequestContext(request, {})
+    resumes = models.Resume.objects.filter(user=request.user.id)
+    c = {'resumes': resumes}
+    c.update(csrf(request))
+    return render(request, 'first/home.html', c)
+
+def login_view(request):
+    if request.method=="POST":
+        try:
+            username=request.POST['username']
+        except KeyError:
+            return render(request, "first/home.html", {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
+
+        try:
+            password=request.POST['password']
+        except KeyError:
+            return render(request, 'first/home.html', {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
+
+        user=authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect('/user/')
+        else:
+            wrong_input = 1;
+            return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':wrong_input}.update(csrf(request)))
+
+    else:
+        return HttpResponseRedirect('/user/')
+
+def logout_view(request):
+    if request.user.is_authenticated():
+        logout(request)
+    return HttpResponseRedirect(reverse("home_url"))
+
+@login_required(login_url='/user/login/')
+def delete_resume_view(request, resume_id):
+    resume = get_object_or_404(models.Resume, id=resume_id)
+    if resume.user.id != request.user.id:
+        return HttpResponse("<h1>Permission Denied</h1>")
+    resume.delete()
+    return HttpResponseRedirect('/user/')
+
+@login_required(login_url='/user/login/')
+def make_resume_view(request):
+
+    ExamFormSet = inlineformset_factory(models.Resume, models.Exam, form=forms.ExamForm, extra=3)
+    ProjectFormSet = inlineformset_factory(models.Resume, models.ProjectInternships, form=forms.ProjectForm, extra=3)
+    TechnicalSkillFormSet = inlineformset_factory(models.Resume, models.TechnicalSkill, form=forms.TechnicalSkillForm, extra=3)
+    ScholasticAchievementsFormSet = inlineformset_factory(models.Resume, models.ScholasticAchievements, form=forms.ScholasticAchievementsForm, extra=3)
+
+    if request.method=='POST':
+        print '\n'
+        if 'hid' in request.POST:
+            resume = get_object_or_404(models.Resume, id=request.POST['hid'])
+            if not resume:
+                return HttpResponse("Resume does not exist")
+            if resume.user.id != request.user.id:
+                return HttpResponse("Permission Denied")
+            form = ResumeForm(request.POST or None, request.FILES or None, instance=resume)
+            examformset = ExamFormSet(request.POST, request.FILES, instance=resume)
+            projectformset = ProjectFormSet(request.POST, request.FILES, instance=resume)
+            technicalformset = TechnicalSkillFormSet(request.POST, request.FILES, instance=resume)
+            scholasticformset = ScholasticAchievementsFormSet(request.POST, request.FILES, instance=resume)
+            if form.is_valid() and examformset.is_valid() and projectformset.is_valid() and scholasticformset.is_valid() and technicalformset.is_valid():
+                form.save()
+                examformset.save()
+                projectformset.save()
+                scholasticformset.save()
+                technicalformset.save()
+                return HttpResponseRedirect("/user/")
+        else:
+            form = ResumeForm(request.POST, request.FILES)
+            examformset = ExamFormSet(request.POST, request.FILES,)
+            projectformset = ProjectFormSet(request.POST, request.FILES)
+            technicalformset = TechnicalSkillFormSet(request.POST, request.FILES)
+            scholasticformset = ScholasticAchievementsFormSet(request.POST, request.FILES)
+            if form.is_valid():
+                instance = form.save(commit=False)
+                instance.user = request.user
+                examformset = ExamFormSet(request.POST, request.FILES, instance=instance)
+                projectformset = ProjectFormSet(request.POST, request.FILES, instance=instance)
+                technicalformset = TechnicalSkillFormSet(request.POST, request.FILES, instance=instance)
+                scholasticformset = ScholasticAchievementsFormSet(request.POST, request.FILES, instance=instance)
+                if examformset.is_valid() and projectformset.is_valid() and scholasticformset.is_valid() and technicalformset.is_valid():
+                    instance.save()
+                    examformset.save()
+                    projectformset.save()
+                    scholasticformset.save()
+                    technicalformset.save()
+                    return HttpResponseRedirect("/user/")
+    else:
+        form = ResumeForm(instance=request.user)
+        # resume_form = models.ResumeModelForm()
+        resume = models.Resume()
+        examformset = ExamFormSet
+        projectformset = ProjectFormSet
+        technicalformset = TechnicalSkillFormSet
+        scholasticformset = ScholasticAchievementsFormSet
+    return render(request, "first/resume_form.html", {'form':form, 'examformset':examformset, 'projectformset':projectformset, 'technicalskillformset': technicalformset, 'scholasticachievementsformset': scholasticformset})
+
+@login_required(login_url='/user/login/')
+def resume_detail_view(request, resume_id):
+    resume = models.Resume.objects.filter(id=resume_id)
+    if not resume:
+        return HttpResponseRedirect(reverse('home_url'))
+    else:
+        if resume[0].user.id!=request.user.id:
+            return HttpResponse("Permission Denied\n")
+        form = ResumeForm(instance=resume[0])
+        examqueryset = models.Exam.objects.filter(resume=resume[0])
+        projectqueryset = models.Exam.objects.filter(resume=resume[0])
+
+        ExamFormSet = inlineformset_factory(models.Resume, models.Exam, form=forms.ExamForm, extra=3)
+        ProjectFormSet = inlineformset_factory(models.Resume, models.ProjectInternships, form=forms.ProjectForm, extra=3)
+        TechnicalSkillFormSet = inlineformset_factory(models.Resume, models.TechnicalSkill, form=forms.TechnicalSkillForm, extra=3)
+        ScholasticAchievementsFormSet = inlineformset_factory(models.Resume, models.ScholasticAchievements, form=forms.ScholasticAchievementsForm, extra=3)
+
+        examformset = ExamFormSet(instance=resume[0])
+        projectformset = ProjectFormSet(instance=resume[0])
+        technicalskillformset = TechnicalSkillFormSet(instance=resume[0])
+        scholasticachievementsformset = ScholasticAchievementsFormSet(instance=resume[0])
+        return render(request, "first/resume_form.html", {'resume':resume[0], 'form':form, 'examformset':examformset, 'projectformset':projectformset, 'technicalskillformset': technicalskillformset, 'scholasticachievementsformset': scholasticachievementsformset})
+
+def get_year(a):
+    if a==1:
+        return '1st'
+    elif(a==2):
+        return '2nd'
+    elif(a==3):
+        return '3rd'
+    elif a==4:
+        return '4th'
+    else:
+        return '5th'
+
+@login_required(login_url='/user/login')
+def getpdf_view(request, resume_id, template_id):
+    if int(template_id) < 1 or int(template_id) > 2:
+        print template_id
+        return HttpResponse("<h1>Template not correctly selcted</h1>")
+
+    resume = models.Resume.objects.filter(id=resume_id)
+    if not resume:
+        return HttpResponse('Page Not Found')
+    if resume[0].user.id!=request.user.id:
+        return HttpResponse('Permission Denied')
+
+    resume = resume[0]
+    examset = resume.exam_set.all()
+    projectset = resume.projectinternships_set.all()
+    technicalskillset = resume.technicalskill_set.all()
+    scholasticachievementset = resume.scholasticachievements_set.all()
+
+<<<<<<< HEAD
+    # string = '''
+    # %\\usepackage{extclasses}
+    # \\documentclass[10pt]{article}
+    # \\setlength\\parindent{0pt}
+    # %\\usepackage[margin=50pt]{geometry}
+    # \\usepackage[]{tabularx}
+    # \\usepackage[]{xcolor, colortbl}
+    # \\usepackage{color}
+    # \\usepackage{enumitem}
+    # \\usepackage[margin=0.5in, top=0.1in]{geometry}
+    # \\definecolor{mygray}{gray}{0.8}
+    # \\newcolumntype{P}[1]{>{\\centering\\arraybackslash}p{#1}}
+    # \\renewcommand{\\baselinestretch}{0.9}
+    # \\begin{document}
+    #
+    # \\title{}
+    # \\date{}
+    # \\maketitle
+    # %\\newgeometry{margin=0.2in,top=-0.5in}
+    # \\vspace{-0.5in}
+    # \\begin{minipage}[t]{7cm}
+    # \\flushleft
+    # '''
+    #
+    # string = string + "{\\LARGE \\textbf{%s}}\\\\" % (resume.name.upper())
+    # string = string + """
+    # %s Year Undergraduate\\\\
+    # %s,\\\\
+    # Indian Institute of Technology, Kanpur\\\\
+    # \\end{minipage}
+    # \\hfill
+    # \\begin{minipage}[t]{7cm}
+    # \\flushright
+    # \\textbf{Email} : %s\\\\
+    # \\textbf{Ph. No} : %s\\\\
+    # \\end{minipage}\\\\
+    #
+    # \\vspace{1mm}
+    # \\hrule width \\textwidth height 1pt
+    # \\vspace{3mm}
+    # """ % (get_year(resume.year), resume.dept, resume.email, resume.phone)
+    #
+    # exams_hai = False
+    # for exam in examset:
+    #     if exam.verified==2:
+    #         exams_hai = True
+    #         break
+    #
+    # if exams_hai:
+    #     string = string + '''
+    #     \\textbf{EDUCATIONAL QUALIFICATIONS}\\\\
+    #     \\newline
+    #     \\begin{tabular}{|P{2.1cm}|P{3.2cm}|P{8cm}|P{3.2cm}|}
+    #     \\hline
+    #
+    #     \\rowcolor{mygray}
+    #     \\textbf{Year,} & \\textbf{Degree/Certificate} & \\bf{Institute/City} & \\bf{CGPA/Percentage}\\\\
+    #     \\hline
+    #
+    #     '''
+    #     for exam in examset:
+    #         if exam.verified==2:
+    #             string = string + '%s&%s&%s&%s\\\\\n' % (exam.year, exam.name, exam.institute, exam.cgpa_percentage)
+    #
+    #     string = string + '''
+    #     \\hline
+    #     \\end{tabular}
+    #
+    #     \\vspace{8mm}
+    #     \\rule{\\textwidth}{1pt}
+    #
+    #     \\vspace{5mm}
+    #     '''
+    # achievements_hai = False
+    # for exam in scholasticachievementset:
+    #     if exam.verified==2:
+    #         achievements_hai = True
+    #         break
+    # if achievements_hai:
+    #     string = string + '''
+    #     \\textbf {SCHOLASTIC ACHIEVEMENTS}
+    #     \\begin{itemize}
+    #     '''
+    #     for item in scholasticachievementset:
+    #         if item.verified==2:
+    #             string = string + '\\item %s\n' % (item.string)
+    #
+    #
+    #     string = string + '''
+    #     \\end{itemize}
+    #
+    #     \\rule{\\textwidth}{1pt}
+    #
+    #     \\vspace{5mm}
+    #     '''
+    # exams_hai = False
+    # for exam in projectset:
+    #     if exam.verified==2:
+    #         exams_hai = True
+    #         break
+    # if exams_hai:
+    #     string = string + '''
+    #     \\textbf{PROJECTS UNDERTAKEN}
+    #     \\begin{itemize}
+    #     '''
+    #     for project in projectset:
+    #         if project.verified==2:
+    #             string = string + '\\item \\textbf{%s}\\\\\n' % (project.title)
+    #             string = string + '\\indent %s\n' % (project.description)
+    #
+    #     string = string + '\\end{itemize}'
+    #
+    # if technicalskillset:
+    #     string = string + '''
+    #     \\rule{\\textwidth}{1pt}
+    #     \\vspace{5mm}
+    #     \\textbf{SKILLS}
+    #     \\begin{itemize}
+    #     '''
+    #     for skill in technicalskillset:
+    #         string = string + '\\item \\textbf{%s: }%s' % (skill.title, skill.description)
+    #
+    #     string = string + '\\end{itemize}'
+    #
+    # string = string + '\\end{document}'
+    # f = open('sample.tex', 'w')
+    # f.write(string)
+    # f.close()
+    string = '''
+    \\documentclass[a4paper,10pt]{article}
+
+    %A Few Useful Packages
+    %\\usepackage{marvosym}
+    %\\usepackage{fontspec} 					%for loading fonts
+    %\\usepackage{xunicode,xltxtra,url,parskip} 	%other packages for formatting
+    \\RequirePackage{color,graphicx}
+    \\usepackage[usenames,dvipsnames]{xcolor}
+    %\\usepackage[big]{layaureo} 				%better formatting of the A4 page
+    % an alternative to Layaureo can be ** \\usepackage{fullpage} **
+    \\usepackage{supertabular} 				%for Grades
+    \\usepackage{titlesec}					%custom \\section
+
+    %Setup hyperref package, and colours for links
+    \\usepackage{hyperref}
+    \\definecolor{linkcolour}{rgb}{0,0.2,0.6}
+    \\hypersetup{colorlinks,breaklinks,urlcolor=linkcolour, linkcolor=linkcolour}
+
+    %FONTS
+    %\\defaultfontfeatures{Mapping=tex-text}
+    %\\setmainfont[SmallCapsFont = Fontin SmallCaps]{Fontin}
+    %\\setmainfont[
+    %SmallCapsFont = Fontin-SmallCaps.otf,
+    %BoldFont = Fontin-Bold.otf,
+    %ItalicFont = Fontin-Italic.otf
+    %]
+    %{Fontin.otf}
+    %%%
+
+    %CV Sections inspired by: 
+        %http://stefano.italians.nl/archives/26
+        \\titleformat{\\section}{\\Large\\scshape\\raggedright}{}{0em}{}[\\titlerule]
+        \\titlespacing{\\section}{0pt}{3pt}{3pt}
+        %Tweak a bit the top margin
+        %\\addtolength{\\voffset}{-1.3cm}
+
+    %Italian hyphenation for the word: ''corporations''
+    \\hyphenation{im-pre-se}
+
+    %-------------WATERMARK TEST [**not part of a CV**]---------------
+    \\usepackage[absolute]{textpos}
+
+    \\setlength{\\TPHorizModule}{30mm} 
+    \\setlength{\\TPVertModule}{\\TPHorizModule}
+    \\textblockorigin{2mm}{0.65\\paperheight}
+    \\setlength{\\parindent}{0pt}
+
+    %--------------------BEGIN DOCUMENT----------------------
+    \\begin{document}
+
+    %WATERMARK TEST [**not part of a CV**]---------------
+    %\\font\\wm=''Baskerville:color=787878'' at 8pt
+    %\\font\\wmweb=''Baskerville:color=FF1493'' at 8pt
+    %{\\wm 
+    %	\\begin{textblock}{1}(0,0)
+    %		\\rotatebox{-90}{\\parbox{500mm}{
+    %			Typeset by Alessandro Plasmati with \\XeTeX\\  \\today\\ for 
+    %			{\\wmweb \\href{http://www.aleplasmati.comuv.com}{aleplasmati.comuv.com}}
+    %		}
+    %	}
+    %	\\end{textblock}
+    %}
+
+    \\pagestyle{empty} % non-numbered pages
+
+    %\\font\\fb=''[cmr10]'' %for use with \\LaTeX command
+
+    %--------------------TITLE-------------
+    \\par{\\centering'''
+    string=string+"{\\Huge %s}\\bigskip\\par}" % (resume.name.upper())
+    string=string+'''
+    %--------------------SECTIONS-----------------------------------
+    %Section: Personal Data
+    \\section{Personal Data}
+
+    \\begin{tabular}{rl}'''
+    string=string+"\\textsc{Batch:} & %s year undergraduate \\\\\\textsc{Department:}   & %s \\\\\\textsc{Name of Institute:}     & IIT Kanpur\\\\\\textsc{email:}     &   \\href{mailto:%s}{%s}\\\\\\textsc{Contact no:}    &  %s\\\\" %(get_year(resume.year), resume.dept, resume.email, resume.email, resume.phone)
+    string=string+'''\\end{tabular}'''
+
+    if examset:
+        string = string + '''
+        %Section: Education
+        \\section{Educational Qualifications}
+        \\begin{tabular}{rl}
+=======
+    if template_id=='1':
+        string = '''
+        %\\usepackage{extclasses}
+        \\documentclass[10pt]{article}
+        \\setlength\\parindent{0pt}
+        %\\usepackage[margin=50pt]{geometry}
+        \\usepackage[]{tabularx}
+        \\usepackage[]{xcolor, colortbl}
+        \\usepackage{color}
+        \\usepackage{enumitem}
+        \\usepackage[margin=0.5in, top=0.1in]{geometry}
+        \\definecolor{mygray}{gray}{0.8}
+        \\newcolumntype{P}[1]{>{\\centering\\arraybackslash}p{#1}}
+        \\renewcommand{\\baselinestretch}{0.9}
+        \\begin{document}
+
+        \\title{}
+        \\date{}
+        \\maketitle
+        %\\newgeometry{margin=0.2in,top=-0.5in}
+        \\vspace{-0.5in}
+        \\begin{minipage}[t]{7cm}
+        \\flushleft
+>>>>>>> e8d175bb3c51565ce3a6b4ab0028de255479c50c
+        '''
+
+        string = string + "{\\LARGE \\textbf{%s}}\\\\" % (resume.name.upper())
+        string = string + """
+        %s Year Undergraduate\\\\
+        %s,\\\\
+        Indian Institute of Technology, Kanpur\\\\
+        \\end{minipage}
+        \\hfill
+        \\begin{minipage}[t]{7cm}
+        \\flushright
+        \\textbf{Email} : %s\\\\
+        \\textbf{Ph. No} : %s\\\\
+        \\end{minipage}\\\\
+
+        \\vspace{1mm}
+        \\hrule width \\textwidth height 1pt
+        \\vspace{3mm}
+        """ % (get_year(resume.year), resume.dept, resume.email, resume.phone)
+
+        exams_hai = False
+        for exam in examset:
+<<<<<<< HEAD
+            string = string + '%s & \\textbf{%s}\\\\ & \\textsc{\\textbf{%s}}\\\\ &\\normalsize \\textsc{\\textbf{CGPA/Percentage}}: %s \\\\\\\\' % (exam.year, exam.institute, exam.name, exam.cgpa_percentage)
+
+            string = string + '''
+            \\end{tabular}
+            '''
+            if scholasticachievementset:
+                string = string + '''
+                %Section: Scholarships and additional info
+                \\section{Scholastic Achievements}
+                \\begin{itemize}
+                '''
+                for item in scholasticachievementset:
+                    string = string + '\\item {%s}' % (item.string)
+
+            string = string + '''
+            \\end{itemize}
+            '''
+
+        if technicalskillset:
+            string = string + '''
+            \\section{Technical Skills}
+            \\begin{tabular}{rl}
+            '''
+            for skill in technicalskillset:
+                string = string + '%s:& \\textsc{%s} \\\\' % (skill.title, skill.description)
+
+            string = string + '\\end{tabular}'
+
+    if projectset:
+         string = string + '''
+         \\section{Projects Undertaken}
+         '''
+         for project in projectset:
+             string = string + '\\par{\\Large \\hypertarget{grds}{ \\textsc{%s}}\\par}\\textsc{%s}\\bigskip\\hrule\\bigskip' % (project.title,project.description)
+
+         string = string + '\\end{document}'
+
+    print string
+=======
+            if exam.verified==2:
+                exams_hai = True
+                break
+
+        if exams_hai:
+            string = string + '''
+            \\textbf{EDUCATIONAL QUALIFICATIONS}\\\\
+            \\newline
+            \\begin{tabular}{|P{2.1cm}|P{3.2cm}|P{8cm}|P{3.2cm}|}
+            \\hline
+
+            \\rowcolor{mygray}
+            \\textbf{Year,} & \\textbf{Degree/Certificate} & \\bf{Institute/City} & \\bf{CGPA/Percentage}\\\\
+            \\hline
+
+            '''
+            for exam in examset:
+                if exam.verified==2:
+                    string = string + '%s&%s&%s&%s\\\\\n' % (exam.year, exam.name, exam.institute, exam.cgpa_percentage)
+
+            string = string + '''
+            \\hline
+            \\end{tabular}
+
+            \\vspace{8mm}
+            \\rule{\\textwidth}{1pt}
+
+            \\vspace{5mm}
+            '''
+        achievements_hai = False
+        for exam in scholasticachievementset:
+            if exam.verified==2:
+                achievements_hai = True
+                break
+        if achievements_hai:
+            string = string + '''
+            \\textbf {SCHOLASTIC ACHIEVEMENTS}
+            \\begin{itemize}
+            '''
+            for item in scholasticachievementset:
+                if item.verified==2:
+                    string = string + '\\item %s\n' % (item.string)
+
+
+            string = string + '''
+            \\end{itemize}
+
+            \\rule{\\textwidth}{1pt}
+
+            \\vspace{5mm}
+            '''
+        exams_hai = False
+        for exam in projectset:
+            if exam.verified==2:
+                exams_hai = True
+                break
+        if exams_hai:
+            string = string + '''
+            \\textbf{PROJECTS UNDERTAKEN}
+            \\begin{itemize}
+            '''
+            for project in projectset:
+                if project.verified==2:
+                    string = string + '\\item \\textbf{%s}\\\\\n' % (project.title)
+                    string = string + '\\indent %s\n' % (project.description)
+
+            string = string + '\\end{itemize}'
+
+        if technicalskillset:
+            string = string + '''
+            \\rule{\\textwidth}{1pt}
+            \\vspace{5mm}
+            \\textbf{SKILLS}
+            \\begin{itemize}
+            '''
+            for skill in technicalskillset:
+                string = string + '\\item \\textbf{%s: }%s' % (skill.title, skill.description)
+
+            string = string + '\\end{itemize}'
+
+        string = string + '\\end{document}'
+    elif template_id=='2':
+        string = '''
+        \\documentclass[a4paper,10pt]{article}
+
+        %A Few Useful Packages
+        %\\usepackage{marvosym}
+        %\\usepackage{fontspec} 					%for loading fonts
+        %\\usepackage{xunicode,xltxtra,url,parskip} 	%other packages for formatting
+        \\RequirePackage{color,graphicx}
+        \\usepackage[usenames,dvipsnames]{xcolor}
+        %\\usepackage[big]{layaureo} 				%better formatting of the A4 page
+        % an alternative to Layaureo can be ** \\usepackage{fullpage} **
+        \\usepackage{supertabular} 				%for Grades
+        \\usepackage{titlesec}					%custom \\section
+
+        %Setup hyperref package, and colours for links
+        \\usepackage{hyperref}
+        \\definecolor{linkcolour}{rgb}{0,0.2,0.6}
+        \\hypersetup{colorlinks,breaklinks,urlcolor=linkcolour, linkcolor=linkcolour}
+
+        %FONTS
+        %\\defaultfontfeatures{Mapping=tex-text}
+        %\\setmainfont[SmallCapsFont = Fontin SmallCaps]{Fontin}
+        %\\setmainfont[
+        %SmallCapsFont = Fontin-SmallCaps.otf,
+        %BoldFont = Fontin-Bold.otf,
+        %ItalicFont = Fontin-Italic.otf
+        %]
+        %{Fontin.otf}
+        %%%
+
+        %CV Sections inspired by:
+            %http://stefano.italians.nl/archives/26
+            \\titleformat{\\section}{\\Large\\scshape\\raggedright}{}{0em}{}[\\titlerule]
+            \\titlespacing{\\section}{0pt}{3pt}{3pt}
+            %Tweak a bit the top margin
+            %\\addtolength{\\voffset}{-1.3cm}
+
+        %Italian hyphenation for the word: ''corporations''
+        \\hyphenation{im-pre-se}
+
+        %-------------WATERMARK TEST [**not part of a CV**]---------------
+        \\usepackage[absolute]{textpos}
+
+        \\setlength{\\TPHorizModule}{30mm}
+        \\setlength{\\TPVertModule}{\\TPHorizModule}
+        \\textblockorigin{2mm}{0.65\\paperheight}
+        \\setlength{\\parindent}{0pt}
+
+        %--------------------BEGIN DOCUMENT----------------------
+        \\begin{document}
+
+        %WATERMARK TEST [**not part of a CV**]---------------
+        %\\font\\wm=''Baskerville:color=787878'' at 8pt
+        %\\font\\wmweb=''Baskerville:color=FF1493'' at 8pt
+        %{\\wm
+        %	\\begin{textblock}{1}(0,0)
+        %		\\rotatebox{-90}{\\parbox{500mm}{
+        %			Typeset by Alessandro Plasmati with \\XeTeX\\  \\today\\ for
+        %			{\\wmweb \\href{http://www.aleplasmati.comuv.com}{aleplasmati.comuv.com}}
+        %		}
+        %	}
+        %	\\end{textblock}
+        %}
+
+        \\pagestyle{empty} % non-numbered pages
+
+        %\\font\\fb=''[cmr10]'' %for use with \\LaTeX command
+
+        %--------------------TITLE-------------
+        \\par{\\centering'''
+        string=string+"{\\Huge %s}\\bigskip\\par}" % (resume.name.upper())
+        string=string+'''
+        %--------------------SECTIONS-----------------------------------
+        %Section: Personal Data
+        \\section{Personal Data}
+
+        \\begin{tabular}{rl}'''
+        string=string+"\\textsc{Batch:} & %s year undergraduate \\\\\\textsc{Department:}   & %s \\\\\\textsc{Name of Institute:}     & IIT Kanpur\\\\\\textsc{email:}     &   \\href{mailto:%s}{%s}\\\\\\textsc{Contact no:}    &  %s\\\\" %(get_year(resume.year), resume.dept, resume.email, resume.email, resume.phone)
+        string=string+'''\\end{tabular}'''
+
+        if examset:
+            string = string + '''
+            %Section: Education
+            \\section{Educational Qualifications}
+            \\begin{tabular}{rl}
+            '''
+            for exam in examset:
+                string = string + '%s & \\textbf{%s}\\\\ & \\textsc{\\textbf{%s}}\\\\ &\\normalsize \\textsc{\\textbf{CGPA/Percentage}}: %s \\\\\\\\' % (exam.year, exam.institute, exam.name, exam.cgpa_percentage)
+
+                string = string + '''
+                \\end{tabular}
+                '''
+                if scholasticachievementset:
+                    string = string + '''
+                    %Section: Scholarships and additional info
+                    \\section{Scholastic Achievements}
+                    \\begin{itemize}
+                    '''
+                    for item in scholasticachievementset:
+                        string = string + '\\item {%s}' % (item.string)
+
+                string = string + '''
+                \\end{itemize}
+                '''
+
+            if technicalskillset:
+                string = string + '''
+                \\section{Technical Skills}
+                \\begin{tabular}{rl}
+                '''
+                for skill in technicalskillset:
+                    string = string + '%s:& \\textsc{%s} \\\\' % (skill.title, skill.description)
+
+                string = string + '\\end{tabular}'
+
+        if projectset:
+             string = string + '''
+             \\section{Projects Undertaken}
+             '''
+             for project in projectset:
+                 string = string + '\\par{\\Large \\hypertarget{grds}{ \\textsc{%s}}\\par}\\textsc{%s}\\bigskip\\hrule\\bigskip' % (project.title,project.description)
+
+             string = string + '\\end{document}'
+
+>>>>>>> e8d175bb3c51565ce3a6b4ab0028de255479c50c
+    #return render(request, "first/latex_template.html", {'content': string})
+
+
+    #string = ''
+    #for field in resume.__dict__:
+     #   if not field.startswith('_'):
+      #      string = string + str(resume.__dict__[field]) + '\n'
+
+
+    #for exam in examset:
+    #    string = string + 'Exam' + '\n'
+    #    for field in exam.__dir__:
+    #        string = string + str(exam.__dir__[field]) + '\n'
+
+    #string = "sanjay"
+
+    template = get_template('first/latex_template.tex')
+    context = Context({'content':string,})
+    rendered_tpl = template.render(context).encode('utf-8')
+    tempdir = 'temp'
+    for i in range(2):
+        process = Popen(
+            ['pdflatex', '-output-directory', tempdir],
+            stdin=PIPE,
+            stdout=PIPE,
+        )
+        process.communicate(rendered_tpl)
+    f =open(os.path.join(tempdir, 'texput.pdf'), 'rb')
+    pdf = f.read()
+    r = HttpResponse(content_type='application/pdf')
+    r.write(pdf)
+    return r
+
+

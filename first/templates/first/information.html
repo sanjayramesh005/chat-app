@@ -1,0 +1,42 @@
+{% extends 'first/base.html' %}
+
+    {% block navbar %}
+    <div>
+        {% if user.is_authenticated %}
+            <nav>
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo right"></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="/user/logout">Logout</a></li>
+              </ul>
+              <ul id="nav-mobile" class="left hide-on-med-and-down">
+                <li><a href="/user/">Home</a></li>
+                <li><a href="/user/make_resume/">Create Resume</a></li>
+                <li><a href="/user/information">Information</a></li>
+              </ul>
+            </div>
+          </nav>
+        {% else %}
+            <nav>
+                <div class="nav-wrapper">
+                  
+                  <a href="#" class="brand-logo right"></a>
+                  <ul id="nav-mobile" class="left hide-on-med-and-down">
+                    <li><a href="/user/">Home</a></li>
+                    <li><a href="/user/make_resume/">Information</a></li>
+                  </ul>
+                </div>
+            </nav>
+        {% endif %}
+    </div>
+    <hr>
+    {% endblock %}
+    {% block content %}
+
+    {% csrf_token %}
+    <p><center><pre>Project by:
+Sanjay Ramesh - sanjayr@iitk.ac.in
+Kartik Raj - kartikr@iitk.ac.in
+Tushar Vatsal - tvatsal@iitk.ac.in
+    </p></center></pre>
+    {% endblock %}

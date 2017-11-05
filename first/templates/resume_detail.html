@@ -1,0 +1,9 @@
+{% extends 'first/base.html' %}
+
+{% block content %}
+    {{ form.as_p }}
+    </br>
+    {% for form in examformset %}
+    {{ form }}
+    {% endfor %}
+{% endblock %}
