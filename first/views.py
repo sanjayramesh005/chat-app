@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.http import (
     JsonResponse
 )
+
+from forms import UserForm
 # @csrf_protect
 def register_view(request):
     if request.method=='POST':
