@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.http import (
     JsonResponse
 )
+from django.core import serializers
 
 from second.models import Message
 
@@ -42,8 +43,6 @@ class GetAllMessages(View):
     def get(self, request, *args, **kwargs):
         user = request.user
         username = request.GET['user']
-        #  print request.GET
-        #  print username
         try:
             other_user = User.objects.get(username=username)
         except:
@@ -57,3 +56,22 @@ class GetAllMessages(View):
         msgs.sort(key=lambda x: x.time, reverse=True)
         all_msgs = [msg.to_dict() for msg in msgs]
         return JsonResponse(all_msgs, safe=False)
+
+class GetAllUsers(View):
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(GetAllUsers, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        msgs = Message.objects.filter(from_user=user)
+        users = [msg.to_user for msg in msgs]
+        msgs = Message.objects.filter(to_user=user)
+        users_tmp = [msg.from_user for msg in msgs]
+        users+=users_tmp
+        users = list(set(users))
+        #  users = serializers.serialize('json', users)
+        users = [{"username":user.username, "name":
+                  user.first_name+" "+user.last_name} for user in users]
+        return JsonResponse(users, safe=False)

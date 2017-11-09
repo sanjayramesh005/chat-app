@@ -11,8 +11,9 @@ class Message(models.Model):
 
     def to_dict(self):
         response = dict()
-        response['from_user'] = self.from_user.username
-        response['to_user'] = self.to_user.username
+        response['from_username'] = self.from_user.username
+        #  response['from_user'] = self.from_user.firstname + " " +
+        response['to_username'] = self.to_user.username
         response['time'] = self.time
         response['text'] = self.text
         return response
