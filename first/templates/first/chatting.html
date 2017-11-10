@@ -1,16 +1,46 @@
 {% extends 'first/base.html' %}
 
 {% block navbar %}
-<div style="
-   
-    width: 1751px;
-            text-align:center;
-            height: 40px;
-    font: italic bold 60px/50px Georgia, serif;color: #663399        
-">
-   Lets' Chat
- 
-    </div>
+<div class="container">
+	<div id="top_line" >
+		<div   style="
+			margin-top: 10px; 
+			width: 1301px;
+			text-align:center;
+			height: 40px;
+			font: italic bold 70px/50px Georgia, serif;color: #663399
+			text-decoration: underline;" >
+			Lets' Chat
+		</div>
+
+
+		<!-- <div  class='col s3'>
+
+			Signed in as:   &nbsp &nbsp 
+
+			<a class='dropdown-button btn' href='#' data-activates='dropdown1'> Sanjay Ramesh </a>
+
+			Dropdown Structure
+			<ul id='dropdown1' class='dropdown-content'>
+				<li><a href="#!">one</a></li>
+				<li class="divider"></li>
+				<li><a href="#!">two</a></li>
+
+			</ul>
+
+		</div> -->   <!--  <div style=" margin-left: 1120px;font: italic bold 20px Georgia, serif;  "  >Singned in as: </div> 	 -->
+		<div class="dropdown"  style=" margin-left: 1300px;"> 
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><u>Sanjay Ramesh</u>
+				<span class="caret"></span></button>
+				<ul class="dropdown-menu">
+					<li><a href="#">About</a></li>
+					<li><a href="#">Log Out</a></li>
+					
+				</ul>
+			</div>
+	</div>
+</div>
+
 {% endblock %}
 
 
@@ -23,7 +53,7 @@
 		<div id='chat-list' class='col s4'>
 			<form>
 				<div class="input-field">
-					<input id="search" type="search" required>
+					<input id="search"  type="search" required>
 					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 					<i class="material-icons">close</i>
 				</div>
@@ -60,8 +90,8 @@
 
 		<div class="col s8">
 		<div id='current-chat'>
-			<div id='current-user'>
-				<strong><h4>Gaurav</h4></strong>
+			<div id='current-user'> 
+				<strong><h4>Gaurav Sharma</h4></strong>
 			</div>
 			<div id='current-msgs' class='jumbotron' style="display:inline-block">
 				<div class="card red  accent-1 from-msg">
@@ -102,9 +132,9 @@
 			</div>
 		</div>
 		<div id='input-box' style='display:fixed' class='row'>
-			<input type='text' class='input-field col s9'></input>
+			<input type='text' class='input-field col s9' placeholder="Enter text here"></input>
 			<div class='col s1'></div>
-			<button class = "btn waves-effect waves-light green col s2" type = "submit">
+			<button class = "btn waves-effect waves-teal darken-3 col s2" type = "submit">
 				Send
             	<i class = "material-icons right">send</i>
             </button>
