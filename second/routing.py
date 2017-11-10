@@ -2,5 +2,6 @@
 from channels.routing import route
 
 channel_routing = [
-    route('websocket.receive', 'second.consumers.ws_echo'),
+    route('websocket.connect', 'second.consumers.ws_connect'),
+    route('websocket.receive', 'second.consumers.ws_receive',),
 ]

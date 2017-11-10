@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.http import (
     JsonResponse
 )
+from second.models import Message
 
 from forms import UserForm
 # @csrf_protect
@@ -42,8 +43,24 @@ def register_view(request):
         return render(request, 'first/register.html', {'form':form, 'fail':False})
 
 #@csrf_protect
+
+def get_all_users(user):
+    msgs = Message.objects.filter(from_user=user)
+    users = [msg.to_user for msg in msgs]
+    msgs = Message.objects.filter(to_user=user)
+    users_tmp = [msg.from_user for msg in msgs]
+    users+=users_tmp
+    users = list(set(users))
+    #  users = serializers.serialize('json', users)
+    users = [{"username":user.username, "name":
+              user.first_name+" "+user.last_name} for user in users]
+    return users
+
 def home_view(request):
     #c = RequestContext(request, {})
+    if request.user.is_authenticated:
+        users = get_all_users(request.user)
+        return render(request, 'first/chatting.html', users)
     c = {}
     c.update(csrf(request))
     return render(request, 'first/home.html', c)
@@ -65,6 +82,7 @@ def login_view(request):
         # user=authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
+            print request.user.username
             return render(request, "first/home.html", {'empty_fields':False, 'wrong_input':False}.update(csrf(request)))
         else:
             return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':1}.update(csrf(request)))
