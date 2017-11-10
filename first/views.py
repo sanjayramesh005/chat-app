@@ -96,3 +96,7 @@ def logout_view(request):
 #
 #          new_msg.save()
 #          return JsonResponse({'success':True, msg:"message successfully sent"})
+
+
+def get_chat(request):
+    return render(request, "first/chatting.html")

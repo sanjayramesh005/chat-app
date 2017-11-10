@@ -8,8 +8,9 @@
         {% endif %}
     </div>
     {% endblock %}
+
     {% block content %}
-    {% if not user.is_authenticated %}
+    <!--{% if not user.is_authenticated %}
     {{ empty_fields }}{{ wrong_input }}
     {% if wrong_input %}
         <p>* Wrong Credentials</p>
@@ -26,5 +27,53 @@
         <input id="password" name="password" type="password" required/></p>
         <input type='submit' value="Login">
     </form>
-    {% endif %}
+    {% endif %} -->
+
+    
+
+<div style="
+   
+    width: 1751px;
+            text-align:center;
+            height: 40px;
+    font: italic bold 60px/50px Georgia, serif;color: #663399        
+">
+   Lets' Chat
+ 
+    </div>
+    
+  <div style="
+    padding-top: 60px;
+    width: 1751px;
+            text-align:center;
+            height: 40px;
+    font: italic bold 30px/50px Georgia, serif;color: #663399        
+">
+   We help you connect and share with the people in your life...
+ 
+    </div>
+        
+    
+    
+    
+    
+    <input type="hidden" name="csrfmiddlewaretoken" value="FD0SSS5h5gCdhphQLb8ZxcKUZx8H8mEu">
+    <form method="POST" action="/user/login/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="FD0SSS5h5gCdhphQLb8ZxcKUZx8H8mEu">
+    <p class="hm_pg"><label for="username" value="Username">Username</label>
+    <input type="text" id="username" name="username" required=""></p>
+    <p class="hm_pg"><label for="password" value="Password">Password</label>
+        <input id="password" name="password" type="password" required=""></p>
+        <input type="submit" value="Login">
+    </form>
+    
+    
+    
+
+
+<iframe frameborder="0" scrolling="no" style="background-color: transparent; border: 0px; display: none;"></iframe><div id="GOOGLE_INPUT_CHEXT_FLAG" style="display: none;" input="" input_stat="{&quot;tlang&quot;:true,&quot;tsbc&quot;:true,&quot;pun&quot;:true,&quot;mk&quot;:true,&quot;ss&quot;:true}"></div>
+
+
+
+
     {% endblock %}
