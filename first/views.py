@@ -51,28 +51,43 @@ def get_all_users(user):
     users_tmp = [msg.from_user for msg in msgs]
     users+=users_tmp
     users = list(set(users))
-    #  users = serializers.serialize('json', users)
-    users = [{"username":user.username, "name":
-              user.first_name+" "+user.last_name} for user in users]
+    msgs = list()
+    for u in users:
+        msg = list(Message.objects.filter(from_user=u, to_user=user))
+        msg_tmp = list(Message.objects.filter(from_user=user, to_user=u))
+        msg+=msg_tmp
+        msg.sort(key=lambda x: x.time, reverse=True)
+        msgs.append(msg[0])
+
+    print msgs
+    msgs.sort(key=lambda x: x.time, reverse=True)
+    users = [msg.from_user if msg.from_user.username!=user.username else msg.to_user for
+            msg in msgs]
+    users = [{"username":u.username, "name":
+              u.first_name+" "+u.last_name} for u in users]
+    print users
     return users
 
 def home_view(request):
     #c = RequestContext(request, {})
-    if request.user.is_authenticated:
+    print request.user
+    print request.user.is_authenticated()
+    if request.user.is_authenticated():
         users = get_all_users(request.user)
-        return render(request, 'first/chatting.html', users)
-    c = {}
-    c.update(csrf(request))
-    return render(request, 'first/home.html', c)
+        return render(request, 'first/chatting.html', {'users':users,
+                                                       'curr_user':request.user})
+    else:
+        c = {}
+        c.update(csrf(request))
+        return render(request, 'first/home.html', c)
 
-#@csrf_protect
+#  @login_required
 def login_view(request):
     if request.method=="POST":
         try:
             username=request.POST['username']
         except KeyError:
             return render(request, "first/home.html", {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
-
         try:
             password=request.POST['password']
         except KeyError:
@@ -83,38 +98,19 @@ def login_view(request):
         if user is not None:
             login(request, user)
             print request.user.username
-            return render(request, "first/home.html", {'empty_fields':False, 'wrong_input':False}.update(csrf(request)))
+            #  return render(request, "first/home.html", {'empty_fields':False, 'wrong_input':False}.update(csrf(request)))
+            return HttpResponseRedirect(reverse("home_url"))
         else:
-            return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':1}.update(csrf(request)))
+            return HttpResponseRedirect(reverse("home_url"))
+            #  return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':1}.update(csrf(request)))
 
     else:
         return HttpResponseRedirect(reverse("home_url"))
 
 def logout_view(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         logout(request)
     return HttpResponseRedirect(reverse("home_url"))
-
-#  @login_required
-#  class AddMessageView(View):
-#
-#      @method_decorator(login_required)
-#      def dispatch(self, request, *args, **kwargs):
-#          return super(AddMessageView, self).dispatch(request, *args, **kwargs)
-#
-#      def post(self, request, *args, **kwargs):
-#          new_msg = Message()
-#          new_msg.from_user = request.user
-#          try:
-#              to_user = User.objects.get(id=request.POST['to'])
-#          except:
-#              response = {'success':False, msg:'To user does not exist'}
-#              return JsonResponse(response)
-#          new_msg.to_user = to_user
-#
-#          new_msg.save()
-#          return JsonResponse({'success':True, msg:"message successfully sent"})
-
 
 def get_chat(request):
     return render(request, "first/chatting.html")

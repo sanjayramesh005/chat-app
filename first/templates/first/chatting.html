@@ -41,6 +41,9 @@
 	</div>
 </div>
 
+<script>
+    var curr_username = '{{ curr_user.username }}';
+</script>
 {% endblock %}
 
 
@@ -51,38 +54,23 @@
 	<div class="row">
 
 		<div id='chat-list' class='col s4'>
-			<form>
+			<!-- <form> -->
 				<div class="input-field">
-					<input id="search"  type="search" required>
+					<input id="search-input" type="search" required>
 					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 					<i class="material-icons">close</i>
+                    <button onclick="newUserChat()">Enter</button>
 				</div>
-			</form>
+			<!-- </form> -->
 			<!-- <div id='search-bar' class='row'>
 				<input type='search'  class="input-field col s11"></input>
 					<i class = "material-icons col s1 search-icon">search</i>
 			</div> -->
 			<div id='friends' class='collection'>
-				<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item active">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
-        		<a href="#!" class="collection-item">Alvin</a>
+                {% for u in users %}
+                <a href='#' class='collection-item' id='{{ u.username }}'
+                          onclick='clickUser("{{ u.username }}")'>{{ u.username }}</a>
+                {% endfor %}
 			</div>
 		</div>
 
@@ -94,50 +82,53 @@
 				<strong><h4>Gaurav Sharma</h4></strong>
 			</div>
 			<div id='current-msgs' class='jumbotron' style="display:inline-block">
-				<div class="card red  accent-1 from-msg">
-					<div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd
-					</div>
-				</div>
-				<div class="card teal darken-1 to-msg">
-				<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-				<div class="card red  accent-1 from-msg">
-				<div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-				<div class="card red  accent-1 from-msg">
-				<div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-
-				<div class="card red  accent-1 from-msg">
-				<div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-
-				<div class="card teal darken-1 to-msg">
-				<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-
-				<div class="card teal darken-1 to-msg">
-					<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-
-				<div class="card teal darken-1 to-msg">
-					<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-				<div class="card teal darken-1 to-msg">
-					<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
-				<div class="card teal darken-1 to-msg">
-					<div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div>
-				</div>
+				<!-- <div class="card red  accent-1 from-msg"> -->
+				<!--     <div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd -->
+				<!--     </div> -->
+				<!-- </div> -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!-- <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+				<!-- <div class="card red  accent-1 from-msg"> -->
+				<!-- <div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+				<!-- <div class="card red  accent-1 from-msg"> -->
+				<!-- <div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+                <!--  -->
+				<!-- <div class="card red  accent-1 from-msg"> -->
+				<!-- <div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+                <!--  -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!-- <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+                <!--  -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!--     <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+                <!--  -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!--     <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!--     <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
+				<!-- <div class="card teal darken-1 to-msg"> -->
+				<!--     <div class="card-content white-text">To msg 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd</div> -->
+				<!-- </div> -->
 			</div>
 		</div>
 		<div id='input-box' style='display:fixed' class='row'>
-			<input type='text' class='input-field col s9' placeholder="Enter text here"></input>
-			<div class='col s1'></div>
-			<button class = "btn waves-effect waves-teal darken-3 col s2" type = "submit">
-				Send
-            	<i class = "material-icons right">send</i>
-            </button>
+            <!-- <form> -->
+                <input type='text' class='input-field col s9' id='msg-input'></input>
+                <div class='col s1'></div>
+                <button class="btn waves-effect waves-light green col s2"
+                    onclick='sendmsg()'>
+                    Send
+                    <i class = "material-icons right">send</i>
+                </button>
+            <!-- </form> -->
 		</div>
 		</div>
 	</div>

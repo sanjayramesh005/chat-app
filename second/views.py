@@ -51,7 +51,6 @@ class GetAllMessages(View):
         
         msgs = list(Message.objects.filter(from_user=user, to_user=other_user))
         msgs_tmp = list(Message.objects.filter(from_user=other_user, to_user=user))
-
         msgs+=msgs_tmp
         msgs.sort(key=lambda x: x.time, reverse=True)
         all_msgs = [msg.to_dict() for msg in msgs]
