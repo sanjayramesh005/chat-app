@@ -78,6 +78,7 @@ body {
   color: black;
   opacity: 1;
 }
+
 #current-chat {
     width:100%;
 }
@@ -85,3 +86,14 @@ body {
     width:100%;
 }
 
+
+
+style=" margin-left: 1250px;"
+
+style="
+			margin-top: 10px; 
+			width: 1401px;
+			text-align:center;
+			height: 40px;
+			font: italic bold 70px/50px Georgia, serif;color: #663399
+			text-decoration: underline;"
