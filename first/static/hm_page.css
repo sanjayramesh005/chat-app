@@ -1,7 +1,26 @@
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 body {
     background-color: #cce6ff;
     background-image: url("/static/1.jpg");
     background-size: cover;
+/* <<<<<<< ccddee17b1229711ef6f944209ca90abf6cfce4f */
+/* ======= */
+/*     height: 100%; */
+/*     margin: 0; */
+/*     padding: 0; */
+/* } */
+/*  */
+/* #chat-list { */
+/*     height: 100%; */
+/* } */
+/*  */
+/* #right-container { */
+/*     height: 100%; */
+/* >>>>>>> ff */
 }
  
 .from-msg {
@@ -61,24 +80,23 @@ body {
 }
 
 .current-user {
-
 	background-color:  #ffff80;
 }
 
-::-webkit-input-placeholder { /* Chrome */
-  color: grey;
-}
-:-ms-input-placeholder { /* IE 10+ */
-  color: grey;
-}
-::-moz-placeholder { /* Firefox 19+ */
-  color: black;
-  opacity: 1;
-}
-:-moz-placeholder { /* Firefox 4 - 18 */
-  color: black;
-  opacity: 1;
-}
+/* ::-webkit-input-placeholder { [> Chrome <] */
+/*   color: grey; */
+/* } */
+/* :-ms-input-placeholder { [> IE 10+ <] */
+/*   color: grey; */
+/* } */
+/* ::-moz-placeholder { [> Firefox 19+ <] */
+/*   color: black; */
+/*   opacity: 1; */
+/* } */
+/* :-moz-placeholder { [> Firefox 4 - 18 <] */
+/*   color: black; */
+/*   opacity: 1; */
+/* } */
 
 #current-chat {
     width:100%;

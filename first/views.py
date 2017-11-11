@@ -17,6 +17,8 @@ from second.models import Message
 from forms import UserForm
 # @csrf_protect
 def register_view(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('home_url'))
     if request.method=='POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -83,15 +85,19 @@ def home_view(request):
 
 #  @login_required
 def login_view(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse("home_url"))
     if request.method=="POST":
         try:
             username=request.POST['username']
         except KeyError:
-            return render(request, "first/home.html", {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
+            return render(request, 'first/login.html')
+            #  return render(request, "first/home.html", {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
         try:
             password=request.POST['password']
         except KeyError:
-            return render(request, 'first/home.html', {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
+            return render(request, 'first/login.html')
+            #  return render(request, 'first/home.html', {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
 
         user=authenticate(username=username, password=password)
         # user=authenticate(username=username, password=password)
@@ -101,7 +107,7 @@ def login_view(request):
             #  return render(request, "first/home.html", {'empty_fields':False, 'wrong_input':False}.update(csrf(request)))
             return HttpResponseRedirect(reverse("home_url"))
         else:
-            return HttpResponseRedirect(reverse("home_url"))
+            return render(request, 'first/login.html')
             #  return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':1}.update(csrf(request)))
 
     else:

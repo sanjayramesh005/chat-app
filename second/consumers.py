@@ -7,6 +7,7 @@ from channels.auth import (
 from channels import Group
 import json
 from django.contrib.auth.models import User
+from channels.asgi import get_channel_layer
 
 from second.models import Message
 
@@ -15,6 +16,10 @@ def ws_connect(message):
     http_user = True
     print "connect", message.user.username
     Group(message.user.username).add(message.reply_channel)
+    channel_layer = get_channel_layer()
+    ch_group_list = channel_layer.group_channels(message.user.username)
+    print ch_group_list
+
     message.reply_channel.send({
         'accept': True,
     })
@@ -39,7 +44,7 @@ def get_all_msgs(user, username):
 
 @channel_session_user
 def ws_receive(message):
-    print message.content, message.user
+    #  print message.content, message.user
     msg = json.loads(message.content['text'])
     
     if msg['type']=='sendmsg':
@@ -62,9 +67,15 @@ def ws_receive(message):
 
     elif msg['type']=='get_all_msgs':
         all_msgs = get_all_msgs(message.user, msg['user'])
-        print all_msgs
+        #  print all_msgs
         response = {'type': 'get_all_msgs', 'msgs': all_msgs}
         Group(message.user.username).send({
             'text': json.dumps(response)
         })
-        
+
+
+@channel_session_user
+def ws_disconnect(message):
+    print "in disconnect"
+    Group(message.user.username).discard(message.reply_channel)
+    

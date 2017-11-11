@@ -1,13 +1,18 @@
 {% extends 'first/base.html' %}
+{% block headblock %}
+<script>
+    var curr_username = '{{ curr_user.username }}';
+</script>
+{% endblock %}
 
 {% block navbar %}
-<div class="container">
-	<div id="top_line" >
+<div class="">
+	<div id="top_line" class="row">
 		<div   style="
 			margin-top: 1%; 
 			width: 100%;
 			text-align:center;
-			height: 40px;
+			height: 5%;
 			font: italic bold 70px/50px Georgia, serif;color: #663399
 			text-decoration: underline;" >
 			Let's Chat
@@ -29,8 +34,8 @@
 			</ul>
 
 		</div> -->   <!--  <div style=" margin-left: 1120px;font: italic bold 20px Georgia, serif;  "  >Singned in as: </div> 	 -->
-		<div class="dropdown"  style=" margin-left: 100%"> 
-			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><u>Sanjay Ramesh</u>
+		<div class="dropdown"  class="col s2"> 
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><u>{{ curr_user.username }}</u>
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
 					<li><a href="#">About</a></li>
@@ -41,9 +46,6 @@
 	</div>
 </div>
 
-<script>
-    var curr_username = '{{ curr_user.username }}';
-</script>
 {% endblock %}
 
 
