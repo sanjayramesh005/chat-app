@@ -32,20 +32,20 @@
 
 <div style="
    
-    width: 1901px;
+    width: 100%;
             text-align:center;
             height: 40px;
     font: italic bold 70px/50px Georgia, serif;
     color: #663399;
-    margin-top: 10px;        
+    margin-top: 1%;        
 ">
    Let's Chat
  
     </div>
     
   <div style="
-    padding-top: 60px;
-    width: 1901px;
+    padding-top: 3%;
+    width: 100%;
             text-align:center;
             height: 40px;
     font: italic bold 30px/50px Georgia, serif;color: #663399        
@@ -62,7 +62,7 @@
     <div id="theme" style="background: url('/static/theme.png'); background-size: cover; height:90%; width:100%;">
     
 
-    <div id="sign_up" style=" margin-left: 10px;  margin-top: 60px; font: bold 40px/50px Georgia, serif;  text-shadow: 3px 3px #000000;color: white;  " >
+    <div id="sign_up" style=" margin-left: 1%;  margin-top: 3%; font: bold 40px/50px Georgia, serif;  text-shadow: 3px 3px #000000;color: white;  " >
         Create an account. <br>
         Its free and always will be!
 
@@ -70,7 +70,11 @@
     </div>
 
     <div id="sign_in">
-        hy
+        <a class="waves-effect waves-light btn-large"  style="margin-left:3%;" href="/user/login"  >SIGN UP</a> <!--  <span style=" margin-top: 80px;  font: bold 60px Georgia, serif;  color:white;  " > &nbsp; / </span> -->
+
+        <a class="waves-effect waves-light btn-large"  style="margin-left:3%;" href="/user/signin"  >SIGN IN</a>
+
+        
     </div>
 
 
@@ -80,7 +84,7 @@
 
 
 </div>    
-    
+   <!--  
     <form method="POST" action="/user/login/">
         {% csrf_token %}
     <p class="hm_pg"><label for="username" value="Username">Username</label>
@@ -88,6 +92,6 @@
     <p class="hm_pg"><label for="password" value="Password">Password</label>
         <input id="password" name="password" type="password" required=""></p>
         <input type="submit" value="Login">
-    </form>
+    </form> -->
     
     {% endblock %}

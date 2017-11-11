@@ -1,0 +1,11 @@
+
+
+
+<form method="POST" action="/user/login/">
+        {% csrf_token %}
+    <p class="hm_pg"><label for="username" value="Username">Username</label>
+    <input type="text" id="username" name="username" required=""></p>
+    <p class="hm_pg"><label for="password" value="Password">Password</label>
+        <input id="password" name="password" type="password" required=""></p>
+        <input type="submit" value="Login">
+    </form>

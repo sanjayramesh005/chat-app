@@ -1,6 +1,7 @@
 body {
     background-color: #cce6ff;
     background-image: url("/static/1.jpg");
+    background-size: cover;
 }
  
 .from-msg {
@@ -46,16 +47,16 @@ body {
 }
 
 #current-msgs {
-	height:600px;
-	overflow: auto;
+	height:550px;
+	overflow: scroll;
 }
 
 .search{
-	padding-top: 20px;
+	padding-top: 5%;
 }
 
 #friends {
-	height: 590px;
+	height: 50%;
 	overflow: auto;
 }
 
@@ -86,14 +87,3 @@ body {
     width:100%;
 }
 
-
-
-style=" margin-left: 1250px;"
-
-style="
-			margin-top: 10px; 
-			width: 1401px;
-			text-align:center;
-			height: 40px;
-			font: italic bold 70px/50px Georgia, serif;color: #663399
-			text-decoration: underline;"

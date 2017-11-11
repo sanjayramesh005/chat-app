@@ -1,12 +1,50 @@
 {% extends 'first/base.html' %}
+{% block navbar %}
+            <nav>
+                <div class="nav-wrapper">
+                  
+                 
+                </div>
+            </nav>
+{% endblock %}
 
 {% block content %}
 <form method="POST" action="/user/register/">
     {% csrf_token %}
-    {% if email_exists %}
-        <p>* Account the given email already exists</p>
-    {% endif %}
-    {{ form.as_p }}
-    <input type='submit' value="Register"/>
-</form>
+   
+    <div class="row">
+        <div class="input-field col s6">
+        	{{form.username.label_tag}}
+			{{form.username}}
+		</div>
+		
+	</div>
+	
+	<div class="row">
+        <div class="input-field col s6">
+        	{{form.password.label_tag}}
+			{{form.password}}
+		</div>
+	</div>
+	<div class="row">
+        <div class="input-field col s6">
+        	{{form.first_name.label_tag}}
+			{{form.first_name}}
+		</div>
+	</div>
+	<div class="row">
+        <div class="input-field col s6">
+        	{{form.last_name.label_tag}}
+			{{form.last_name}}
+		</div>
+	</div>
+	<div class="row">
+        
+        <p>By clicking Sign Up, you agree to our Terms of using your private info to SPAM you!</p>
+        <a class="waves-effect waves-light btn-large"  style="margin-left:3%;" href="/user/signin"  >SIGN UP</a> 
+    
+        </form>
+       
+    </div>
+    
 {% endblock %}

@@ -4,8 +4,8 @@
 <div class="container">
 	<div id="top_line" >
 		<div   style="
-			margin-top: 10px; 
-			width: 1301px;
+			margin-top: 1%; 
+			width: 100%;
 			text-align:center;
 			height: 40px;
 			font: italic bold 70px/50px Georgia, serif;color: #663399
@@ -29,7 +29,7 @@
 			</ul>
 
 		</div> -->   <!--  <div style=" margin-left: 1120px;font: italic bold 20px Georgia, serif;  "  >Singned in as: </div> 	 -->
-		<div class="dropdown"  style=" margin-left: 1300px;"> 
+		<div class="dropdown"  style=" margin-left: 100%"> 
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><u>Sanjay Ramesh</u>
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
@@ -50,16 +50,17 @@
 {% block content %}
 
 <div class="container">
-	<div style='margin-top:60px;'></div>
+	<div style='margin-top:7%;'></div>
 	<div class="row">
 
 		<div id='chat-list' class='col s4'>
 			<!-- <form> -->
-				<div class="input-field">
-					<input id="search-input" type="search" required>
-					<label class="label-icon" for="search"><i class="material-icons">search</i></label>
-					<i class="material-icons">close</i>
-                    <button onclick="newUserChat()">Enter</button>
+				<div class="input-field   row"  >
+					<input id="search-input" type="search" class="col s9"  required>
+					<!-- <label class="label-icon " for="search"><i class="material-icons">search</i></label>
+					<i class="material-icons">close</i> -->
+               
+                    <button class="btn waves-effect waves-light   col s3" onclick='newUserChat()'>Find</button>
 				</div>
 			<!-- </form> -->
 			<!-- <div id='search-bar' class='row'>
@@ -77,11 +78,11 @@
 
 
 		<div class="col s8">
-		<div id='current-chat'>
-			<div id='current-user'> 
-				<strong><h4>Gaurav Sharma</h4></strong>
+		<div id='current-chat' style="width:100%">
+			<div id='current-user' style="width:100%"> 
+				<h4>My Friend:  <strong>Gaurav Sharma</strong></h4>
 			</div>
-			<div id='current-msgs' class='jumbotron' style="display:inline-block">
+			<div id='current-msgs' class='jumbotron' style=" width:100%;">
 				<!-- <div class="card red  accent-1 from-msg"> -->
 				<!--     <div class="card-content">From msg 1 2aksjdbakjsdbkajsdbkajsdbkajsdblajsdblaksdblaskdblasbd akjdbakjsdbalsjdba aksjdblajsdblajbsdl asjdbalsdjbalsbd -->
 				<!--     </div> -->
@@ -157,9 +158,9 @@
 		</div>
 		<div id='input-box' style='display:fixed' class='row'>
             <!-- <form> -->
-                <input type='text' class='input-field col s9' id='msg-input'></input>
+                <input type='text' class='input-field col s9' id='msg-input'  placeholder="Write what your heart says...." ></input>
                 <div class='col s1'></div>
-                <button class="btn waves-effect waves-light green col s2"
+                <button class="btn waves-effect waves-light  col s2"
                     onclick='sendmsg()'>
                     Send
                     <i class = "material-icons right">send</i>
