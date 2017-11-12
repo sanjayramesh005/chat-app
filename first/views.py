@@ -18,12 +18,15 @@ from forms import UserForm
 # @csrf_protect
 def register_view(request):
     if request.user.is_authenticated():
+        print "user is authenticated"
         return HttpResponseRedirect(reverse('home_url'))
     if request.method=='POST':
         form = UserForm(request.POST)
         if form.is_valid():
+            print "form is valid"
             email_exists = User.objects.filter(email=form.cleaned_data['email']).exists()
             if email_exists:
+                print "email exists"
                 return render(request, 'first/register.html', {'form':form, 'email_exists':True, 'fail':True})
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -98,20 +101,22 @@ def login_view(request):
         except KeyError:
             return render(request, 'first/login.html')
             #  return render(request, 'first/home.html', {'empty_fields':True, 'wrong_input':False}.update(csrf(request)))
-
+        print username, password
         user=authenticate(username=username, password=password)
         # user=authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
             print request.user.username
             #  return render(request, "first/home.html", {'empty_fields':False, 'wrong_input':False}.update(csrf(request)))
+            #return render(request, 'first/login.html')
             return HttpResponseRedirect(reverse("home_url"))
         else:
             return render(request, 'first/login.html')
             #  return render(request, 'first/home.html', {'empty_fields':False, 'wrong_input':1}.update(csrf(request)))
 
     else:
-        return HttpResponseRedirect(reverse("home_url"))
+        return render(request, 'first/login.html')
+        #return HttpResponseRedirect(reverse("home_url"))
 
 def logout_view(request):
     if request.user.is_authenticated():

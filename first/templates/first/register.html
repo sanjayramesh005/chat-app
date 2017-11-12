@@ -1,48 +1,60 @@
 {% extends 'first/base.html' %}
 {% block navbar %}
-            <nav>
-                <div class="nav-wrapper">
-                  
-                 
-                </div>
-            </nav>
+            
+            
 {% endblock %}
 
 {% block content %}
-<form method="POST" action="/user/register/">
+<form method="POST" action="/user/signin/" >
     {% csrf_token %}
    
+
+
+
+
     <div class="row">
-        <div class="input-field col s6">
-        	{{form.username.label_tag}}
+        <div class="input-field col s6" >
+        	<!-- {{form.username.label_tag}} -->
+			<label for="id_username"  style="color: black;"  >Username:</label>
 			{{form.username}}
 		</div>
 		
 	</div>
 	
+
+ <div class="row">	
+	 <div class="input-field col s6">
+        	<label for="id_email"   style="color: black;">Email address:</label>
+			{{form.email}}
+		</div>
+	</div>
+
+
+
 	<div class="row">
         <div class="input-field col s6">
-        	{{form.password.label_tag}}
+        	<label for="id_password"   style="color: black;">Password:</label>
 			{{form.password}}
 		</div>
 	</div>
 	<div class="row">
         <div class="input-field col s6">
-        	{{form.first_name.label_tag}}
+        	<label for="id_first_name"   style="color: black;">First Name:</label>
 			{{form.first_name}}
 		</div>
 	</div>
 	<div class="row">
         <div class="input-field col s6">
-        	{{form.last_name.label_tag}}
+        	<label for="id_last_name"   style="color: black;">Last Name:</label>
 			{{form.last_name}}
 		</div>
 	</div>
 	<div class="row">
         
-        <p>By clicking Sign Up, you agree to our Terms of using your private info to SPAM you!</p>
-        <a class="waves-effect waves-light btn-large"  style="margin-left:3%;" href="/user/signin"  >SIGN UP</a> 
-    
+        <p  style="margin-left: 20px; font-size: 20px;"  > <strong>By clicking Sign Up, you agree to our Terms of using your private info to SPAM you!</strong>  </p>
+        <button class="btn waves-effect waves-light" type="submit" name="action"   style="margin-left: 20px;"  >Login
+   
+  		</button>
         </form>
        
     </div>

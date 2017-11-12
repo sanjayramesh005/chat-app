@@ -156,7 +156,7 @@ $(window).load(function() {
     current_user.innerHTML = username;
     msg = {'type': 'get_all_msgs', 'user': username};
     msg = JSON.stringify(msg);
-    setTimeout(function(){console.log("seding message"); sock.send(msg);}, 1000);
+    setTimeout(function(){console.log("seding message"); sock.send(msg);}, 2000);
     // sock.send(msg);
    // initialize();
 });
