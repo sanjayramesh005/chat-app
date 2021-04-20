@@ -3,7 +3,7 @@ asgiref==1.1.2
 AST==0.0.2
 attrs==15.2.0
 auquan-toolbox==2.0.2
-autobahn==17.10.1
+autobahn==20.12.3
 Automat==0.6.0
 backports-abc==0.4
 backports.shutil-get-terminal-size==1.0.0
