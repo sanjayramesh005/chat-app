@@ -161,7 +161,7 @@ Twisted==15.5.0
 txaio==2.8.2
 ubuntuone-client-data==14.4
 unity-lens-photos==1.0
-urllib3==1.22
+urllib3==1.26.5
 vboxapi==1.0
 virtualenv==15.0.1
 w3lib==1.13.0
