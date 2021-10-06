@@ -138,7 +138,7 @@ scandir==1.5
 scikit-image==0.13.1
 scikit-learn==0.19.0
 scipy==0.17.0
-Scrapy==1.0.4
+Scrapy==1.8.1
 selenium==2.53.1
 service-identity==14.0.0
 simplegeneric==0.8.1
