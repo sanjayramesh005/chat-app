@@ -80,7 +80,7 @@ numpy==1.13.1
 oauthlib==1.0.3
 oneconf==0.3.9
 opencv-python==3.3.0.10
-openpyxl==2.3.5
+openpyxl==2.4.2
 packaging==16.8
 PAM==0.4.2
 pandas==0.20.3
