@@ -17,7 +17,7 @@ boto==2.38.0
 capstone==3.0.4
 CDApplet==1.0
 CDBashApplet==1.0
-certifi==2017.7.27.1
+certifi==2022.12.7
 cffi==1.5.0
 channels==1.1.8
 characteristic==14.3.0
